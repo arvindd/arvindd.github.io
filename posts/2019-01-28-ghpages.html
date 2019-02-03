@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Hakyll - Using Hakyll with Github</title>
+
+        <!-- Stylesheets. -->
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+
+        <!-- Metadata. -->
+        <meta name="keywords" content="hakyll,static site generator,static,site,generator,haskell,blog" />
+        <meta name="description" content="Hakyll - A Static Site Generator in Haskell." />
+    </head>
+    <body>
+        <div id="main">
+            <div id="header">
+                <a href="../">
+                    <img src="../images/lambda.png" alt="lambda" />
+                    My blog on github
+                </a>
+            </div>
+            <!-- Sidebar. -->
+            <div id="sidebar">
+                <h1>Navigation</h1>
+                <a href="../index.html">home</a>
+                <a href="../about.html">about</a>
+            </div>
+
+            <div id="content">
+                <article>
+    <section class="header">
+        Posted on January 28, 2019
+        
+    </section>
+    <section>
+        <p>The best place to start from is of course <a href="https://jaspervdj.be/hakyll/tutorials/github-pages-tutorial.html" title="Github pages">here</a> - there is only a slight addition here, but here I try to consolidate all aspects of installing and using Hakyll with github.</p>
+<h1 id="so-what-is-different-in-this-article">So, what is different in this article?</h1>
+<p>Well, this is something that worked for me. And the only change I did was to not to follow <a href="https://jaspervdj.be/hakyll/tutorials/github-pages-tutorial.html" title="Github pages">the above</a> article in its entirety - and just replaced the <code>stack new myblog hakyll-template</code> with the instructions in the installation.</p>
+<p>I did this, because stack was pulling down the nightly build with the template way. I decided to use the native hakyll way for initing the hakyll site: using <code>hakyll-init my-site</code>, and then initialse git for use with github-pages.</p>
+<h1 id="the-basic-idea">The basic idea</h1>
+<p>The basic idea of how you would maintain your site is by having two branches: one called “develop”, where you will have your markdown files for posts (and of course, the other Hakyll files and your build-output html files). Your master branch does not need your markdown files, and will only contain the posts in html form - which is what github pages require.</p>
+<h1 id="installation">Installation</h1>
+<p>Installation instructions are <a href="https://jaspervdj.be/hakyll/tutorials/01-installation.html" title="Installation">here</a>, and they worked perfectly for me. So I just repeat the steps here to keep this complete (I just changed the “my-site” to “ghblog” - but this does not make a difference for you if you want to keep it as “my-site”:</p>
+<pre><code>$ stack install hakyll    # Install hakyll
+$ hakyll-init ghblog     # Build example site, creates also site.hs that holds configuration of the site
+$ cd ghblog
+$ stack init              # Creates stack.yaml file based on ghblog.cabal
+$ stack build             # Build the site 
+$ # Dont build the posts yet...</code></pre>
+<h1 id="integrating-with-github-pages">Integrating with Github pages</h1>
+<p>I don’t repeat everything that is mentioned <a href="https://jaspervdj.be/hakyll/tutorials/github-pages-tutorial.html" title="Github pages">here</a>. I cannot do a better job than that.</p>
+<p>Just follow all instructions here, until actually creating a stack project in the local-setup using <code>stack new</code>. You do not need this step, because, as a part of the installation above, you have already created a site.</p>
+<p>Then, create a .gitignore file as follows:</p>
+<pre><code># Created by https://www.gitignore.io/api/haskell
+
+### Haskell ###
+dist
+cabal-dev
+*.o
+*.hi
+*.chi
+*.chs.h
+*.dyn_o
+*.dyn_hi
+.hpc
+.hsenv
+.cabal-sandbox/
+cabal.sandbox.config
+*.prof
+*.aux
+*.hp
+.stack-work/
+_cache/
+_site/</code></pre>
+<p>Finally, initialise git and add the files to your local git repository:</p>
+<pre><code>git init
+# create new branch called develop and switch to it.
+git checkout -b develop
+# track all the source files for our blog.
+git add .
+# make our first commit
+git commit -m &quot;initial commit.&quot;
+# and add the GitHub repository as a remote.
+git remote add origin &lt;URL to your GitHub pages repository&gt;</code></pre>
+<p>Deploying your site github, again, copied from <a href="https://jaspervdj.be/hakyll/tutorials/github-pages-tutorial.html" title="Github pages">the same place</a> is as follows:</p>
+<pre><code># Temporarily store uncommited changes
+git stash
+
+# Verify correct branch
+git checkout develop
+
+# Build new files
+stack exec ghblog clean
+stack exec ghblog build
+
+# Get previous files
+git fetch --all
+git checkout -b master --track origin/master
+
+# Overwrite existing files with new files
+cp -a _site/. .
+
+# Commit
+git add -A
+git commit -m &quot;Publish.&quot;
+
+# Push
+git push origin master:master
+
+# Restoration
+git checkout develop
+git branch -D master
+git stash pop</code></pre>
+<p>Enjoy Hakyll with GitHub!</p>
+    </section>
+</article>
+
+            </div>
+
+            <div id="footer">
+                Site proudly generated by <a href="http://github.com/jaspervdj/hakyll">hakyll</a>.
+            </div>
+        </div>
+
+        <!-- Google Analytics -->
+        <!-- Copy code here -->
+    </body>
+
+</html>
