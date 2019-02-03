@@ -1,0 +1,105 @@
+---
+title: Using Hakyll with Github
+---
+The best place to start from is of course [here][2] - there is only a slight addition here, but here I try to consolidate all aspects of installing and using Hakyll with github.
+
+# So, what is different in this article?
+Well, this is something that worked for me. And the only change I did was to not to follow [the above][2] article in its entirety - and just replaced the `stack new myblog hakyll-template` with the instructions in the installation.
+
+I did this, because stack was pulling down the nightly build with the template way. I decided to use the native hakyll way for initing the hakyll site: using `hakyll-init my-site`, and then initialse git for use with github-pages. 
+
+# The basic idea
+The basic idea of how you would maintain your site is by having two branches: one called "develop", where you will have your markdown files for posts (and of course, the other Hakyll files and your build-output html files). Your master branch does not need your markdown files, and will only contain the posts in html form - which is what github pages require.
+
+# Installation
+Installation instructions are [here][1], and they worked perfectly for me. So I just repeat the steps here to keep this complete (I just changed the "my-site" to "ghblog" - but this does not make a difference for you if you want to keep it as "my-site":
+
+    $ stack install hakyll    # Install hakyll
+    $ hakyll-init ghblog     # Build example site, creates also site.hs that holds configuration of the site
+    $ cd ghblog
+    $ stack init              # Creates stack.yaml file based on ghblog.cabal
+    $ stack build             # Build the site 
+    $ # Dont build the posts yet...
+
+# Integrating with Github pages
+I don't repeat everything that is mentioned [here][2]. I cannot do a better job than that.
+
+Just follow all instructions here, until actually creating a stack project in the local-setup using ```stack new```. You do not need this step, because, as a part of the installation above, you have already created a site.
+
+Then, create a .gitignore file as follows:
+
+```
+# Created by https://www.gitignore.io/api/haskell
+
+### Haskell ###
+dist
+cabal-dev
+*.o
+*.hi
+*.chi
+*.chs.h
+*.dyn_o
+*.dyn_hi
+.hpc
+.hsenv
+.cabal-sandbox/
+cabal.sandbox.config
+*.prof
+*.aux
+*.hp
+.stack-work/
+_cache/
+_site/
+```
+
+Finally, initialise git and add the files to your local git repository:
+
+```
+git init
+# create new branch called develop and switch to it.
+git checkout -b develop
+# track all the source files for our blog.
+git add .
+# make our first commit
+git commit -m "initial commit."
+# and add the GitHub repository as a remote.
+git remote add origin <URL to your GitHub pages repository>
+```
+
+Deploying your site github, again, copied from [the same place][2] is as follows:
+
+```
+# Temporarily store uncommited changes
+git stash
+
+# Verify correct branch
+git checkout develop
+
+# Build new files
+stack exec ghblog clean
+stack exec ghblog build
+
+# Get previous files
+git fetch --all
+git checkout -b master --track origin/master
+
+# Overwrite existing files with new files
+cp -a _site/. .
+
+# Commit
+git add -A
+git commit -m "Publish."
+
+# Push
+git push origin master:master
+
+# Restoration
+git checkout develop
+git branch -D master
+git stash pop
+```
+
+Enjoy Hakyll with GitHub!
+
+[1]: https://jaspervdj.be/hakyll/tutorials/01-installation.html "Installation"
+[2]: https://jaspervdj.be/hakyll/tutorials/github-pages-tutorial.html "Github pages"
